@@ -252,12 +252,21 @@ public class SolutionsGenerator {
         allMoves.add("B");
         allMoves.add("B2");
         allMoves.add("B'");
-
-        generateSolutions();
-        tempFormatSolutions();
+//
+//        generateSolutions();
+//        tempFormatSolutions();
         loadStringToImage();
         loadFont();
         drawSolutions();
+//        formatFileNames();
+    }
+
+    private static void formatFileNames() {
+        File folder = new File("res/images");
+        File[] listOfFiles = folder.listFiles();
+        for (File file : listOfFiles) {
+            file.renameTo(new File(folder.getPath() + String.format("%05d", Integer.parseInt(file.getName().split("\\.")[0])) + ".png"));
+        }
     }
 
     private static void loadStringToImage() throws IOException {
@@ -324,10 +333,18 @@ public class SolutionsGenerator {
                             moveIndex++;
                         }
                         if (g2.getFontMetrics().stringWidth(halfAlg2.toString()) > 153 || g2.getFontMetrics().stringWidth(halfAlg1.toString()) > 153){
-                            g2.setFont(customFont.deriveFont(16f));
-                            g2.drawString(halfAlg1.toString(), x * 160 + 3, y * 135 + 109 + 3);
-                            g2.drawString(halfAlg2.toString(), x * 160 + 3, y * 135 + 109 + 19 + 3);
-                            g2.setFont(customFont);
+                            float fontSize = 20f;
+                            while(true){
+                                g2.setFont(customFont.deriveFont(fontSize -= 0.1f));
+                                if (g2.getFontMetrics().stringWidth(halfAlg2.toString()) > 153 || g2.getFontMetrics().stringWidth(halfAlg1.toString()) > 153){
+                                    continue;
+                                }
+
+                                g2.drawString(halfAlg1.toString(), x * 160 + 3, y * 135 + 109 + 3);
+                                g2.drawString(halfAlg2.toString(), x * 160 + 3, y * 135 + 109 + 19 + 3);
+                                g2.setFont(customFont);
+                                break;
+                            }
                         }
                         else{
                             g2.drawString(halfAlg1.toString(), x * 160 + 3, y * 135 + 109 + 3);
@@ -340,7 +357,7 @@ public class SolutionsGenerator {
                     index++;
                 }
             }
-            File outputfile = new File("res/images/" + currentImage + ".png");
+            File outputfile = new File("res/images/" + String.format("%05d", currentImage) + ".png");
             ImageIO.write(img, "png", outputfile);
             algsAndStates.clear();
             currentImage++;
